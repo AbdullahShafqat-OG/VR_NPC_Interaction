@@ -5,9 +5,16 @@ using TMPro;
 
 public class NPCDialog : MonoBehaviour
 {
+    public Transform player;
+
+    [SerializeField]
+    private TMP_Text _npcText;
+
     private GameObject _localCanvas;
     private TMP_InputField _playerInputField;
     private Animator _animator;
+
+    private Quaternion _initialRotation;
 
     private void Start()
     {
@@ -24,6 +31,11 @@ public class NPCDialog : MonoBehaviour
         _localCanvas.SetActive(true);
 
         _animator.SetBool("talking", true);
+
+        _initialRotation = transform.rotation;
+        Vector3 delta = new Vector3(player.position.x - transform.position.x, 0.0f, player.position.z - transform.position.z);
+
+        transform.rotation = Quaternion.LookRotation(delta);
     }
 
     public void EndInteraction()
@@ -32,6 +44,8 @@ public class NPCDialog : MonoBehaviour
         _localCanvas.SetActive(false);
 
         _animator.SetBool("talking", false);
+
+        transform.rotation = _initialRotation;
     }
 
     public void GetPlayerInput()
@@ -39,6 +53,14 @@ public class NPCDialog : MonoBehaviour
         string text = _playerInputField.text;
         Debug.Log("PLAYER INPUT: " + text);
 
+        // this is where you will hook up ChatGPT API for NPC response
+        GenerateNPCResponse(text);
+
         _playerInputField.text = "";
+    }
+
+    private void GenerateNPCResponse(string text)
+    {
+        _npcText.text = "NEW RESPONSE TO : " + text;
     }
 }
